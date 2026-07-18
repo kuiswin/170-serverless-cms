@@ -65,10 +65,14 @@ function save_posts_metadata($bucket, $metadata) {
 
 // Google OAuth 2.0 Helpers
 function get_oauth_redirect_uri() {
-    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    // Cloud Run (X-Forwarded-Proto) 対応
+    $protocol = (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') 
+                ? 'https' 
+                : ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http');
     $host = $_SERVER['HTTP_HOST'];
     return "{$protocol}://{$host}/";
 }
+
 
 function build_oauth_url($state, $client_id, $redirect_uri) {
     $params = [
