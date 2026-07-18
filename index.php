@@ -18,18 +18,22 @@ $bucket = $storage->bucket($bucket_name);
 $media_bucket = $storage->bucket($media_bucket_name);
 
 // 認証処理 (簡易ログイン)
+session_save_path('/tmp');
 session_start();
 $is_admin = isset($_SESSION['admin']) && $_SESSION['admin'] === true;
+$login_error = '';
 
 if (isset($_POST['action']) && $_POST['action'] === 'login') {
     if ($_POST['password'] === $admin_password) {
         $_SESSION['admin'] = true;
-        header('Location: /');
-        exit;
+        $is_admin = true;
+    } else {
+        $login_error = 'パスワードが違います。';
     }
 }
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     unset($_SESSION['admin']);
+    $is_admin = false;
     header('Location: /');
     exit;
 }
@@ -152,11 +156,16 @@ $parsedown = new Parsedown();
         <?php if ($is_admin): ?>
             <a href="?action=logout">ログアウト</a>
         <?php else: ?>
-            <form method="POST" style="display:flex; gap:10px;">
-                <input type="hidden" name="action" value="login">
-                <input type="password" name="password" placeholder="パスワード">
-                <input type="submit" value="ログイン">
-            </form>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
+                <form method="POST" style="display:flex; gap:10px;">
+                    <input type="hidden" name="action" value="login">
+                    <input type="password" name="password" placeholder="パスワード" required>
+                    <input type="submit" value="ログイン">
+                </form>
+                <?php if ($login_error): ?>
+                    <span style="color:red; font-size:12px;"><?= htmlspecialchars($login_error) ?></span>
+                <?php endif; ?>
+            </div>
         <?php endif; ?>
     </header>
 
