@@ -4,9 +4,9 @@ set -e
 # 各種パラメータの設定
 PROJECT_ID="your-google-cloud-project-id"
 REGION="asia-northeast1"
-SERVICE_NAME="wordpress-serverless"
-BUCKET_NAME="${PROJECT_ID}-wordpress-db-bucket"
-MEDIA_BUCKET_NAME="${PROJECT_ID}-wordpress-media-bucket"
+SERVICE_NAME="serverless-cms"
+BUCKET_NAME="${PROJECT_ID}-cms-data"
+MEDIA_BUCKET_NAME="${PROJECT_ID}-cms-media"
 
 echo "🚀 Google Cloud本番デプロイシーケンスを開始します..."
 
@@ -14,7 +14,7 @@ echo "🚀 Google Cloud本番デプロイシーケンスを開始します..."
 gcloud config set project ${PROJECT_ID}
 
 # 2. GCS バケットの作成
-# ① データベースのレプリカ（SQLite）を格納するGCSバケットを作成します
+# ① 記事データ（JSON/Markdown）を格納するGCSバケットを作成します
 if ! gcloud storage buckets describe gs://${BUCKET_NAME} &>/dev/null; then
     gcloud storage buckets create gs://${BUCKET_NAME} \
         --location=${REGION} \
