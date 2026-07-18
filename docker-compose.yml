@@ -1,0 +1,19 @@
+services:
+  cms-app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - GOOGLE_CLOUD_PROJECT=kym-ramen-project
+      - GCS_BUCKET=serverless-cms-data
+      - GCS_MEDIA_BUCKET=serverless-cms-media
+      - ADMIN_PASSWORD=admin
+      - STORAGE_EMULATOR_HOST=gcs-emulator:4443
+    depends_on:
+      - gcs-emulator
+
+  gcs-emulator:
+    image: fsouza/fake-gcs-server:latest
+    ports:
+      - "4443:4443"
+    command: -scheme http -port 4443
