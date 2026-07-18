@@ -1,6 +1,13 @@
 {
+    "name": "kuiswin/gcs-flat-file-cms",
+    "description": "A lightweight serverless CMS backed by Google Cloud Storage",
     "require": {
-        "google/cloud-storage": "^1.39",
+        "google/cloud-storage": "^1.42",
         "erusev/parsedown": "^1.7"
+    },
+    "config": {
+        "allow-plugins": {
+            "google/cloud-storage": true
+        }
     }
 }

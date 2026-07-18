@@ -1,19 +1,33 @@
 services:
-  cms-app:
-    build: .
-    ports:
-      - "8080:8080"
-    environment:
-      - GOOGLE_CLOUD_PROJECT=kym-ramen-project
-      - GCS_BUCKET=serverless-cms-data
-      - GCS_MEDIA_BUCKET=serverless-cms-media
-      - ADMIN_PASSWORD=admin
-      - STORAGE_EMULATOR_HOST=gcs-emulator:4443
-    depends_on:
-      - gcs-emulator
-
+  # 1. Google Cloud Storage Emulator (fake-gcs-server)
   gcs-emulator:
     image: fsouza/fake-gcs-server:latest
+    container_name: gcs-emulator
     ports:
       - "4443:4443"
-    command: -scheme http -port 4443
+    command: -scheme http -public-host gcs-emulator:4443
+    restart: always
+
+  # 2. Custom GCS Flat-File CMS Application
+  cms:
+    build: .
+    container_name: cms-app
+    depends_on:
+      - gcs-emulator
+    ports:
+      - "8080:80"
+    environment:
+      - PORT=80
+      # Bucket names for data and media
+      - GCS_BUCKET=local-bucket
+      - GCS_MEDIA_BUCKET=local-media-bucket
+      # Env var automatically read by Google Cloud SDK for local emulation
+      - STORAGE_EMULATOR_HOST=http://gcs-emulator:4443
+      # Admin password for test login (fallback)
+      - ADMIN_PASSWORD=admin
+      # Google OAuth 2.0 Credentials (OIDC)
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+      # Authorized administrator email (SHA-256 hash)
+      - ADMIN_EMAIL_HASH=${ADMIN_EMAIL_HASH:-}
+    restart: always
