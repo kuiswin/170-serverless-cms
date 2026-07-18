@@ -45,14 +45,64 @@ function get_gcs_url($bucket_name, $filename) {
     return "https://storage.googleapis.com/{$bucket_name}/{$filename}";
 }
 
-// Load post metadata list from GCS (posts.json)
+// Load post metadata list from GCS (posts.json) with auto-seeding for empty/new environments
 function load_posts_metadata($bucket) {
     $object = $bucket->object('posts.json');
     if ($object->exists()) {
         $content = $object->downloadAsString();
-        return json_decode($content, true) ?: [];
+        $data = json_decode($content, true);
+        if (!empty($data)) {
+            return $data;
+        }
     }
-    return [];
+
+    // Default poem data to seed
+    $default_posts = [
+        [
+            'id' => 1700000001,
+            'title' => 'おぉロミオ、どうしてあなたはロミオなの？',
+            'date' => '2026-07-19 07:00:00',
+            'image_path' => ''
+        ],
+        [
+            'id' => 1700000002,
+            'title' => 'アクセスゼロの夜に',
+            'date' => '2026-07-18 23:00:00',
+            'image_path' => ''
+        ],
+        [
+            'id' => 1700000003,
+            'title' => '完全0円の愛',
+            'date' => '2026-07-18 12:00:00',
+            'image_path' => ''
+        ]
+    ];
+
+    $poems = [
+        1700000001 => "おぉロミオ、あなたはどうしてロミオなの？  \n私の愛のささやきが、このGCS（Google Cloud Storage）の静寂なバケットに吸い込まれていく。  \n\nアクセスがないこのアイドル時間、サーバーレスだから私の想いも維持費も0円。  \n無風の夜に、コストも風も吹かない。",
+        1700000002 => "今日もまた、誰一人として私のポエムを読みに来なかった。  \n静まり返るインターネットの海。  \n\n平気よ。なぜなら、Cloud Runはアクセスがなければコンテナを完全に0台にして眠りにつくから。  \n静寂こそが、究極のFinOpsなのだ。",
+        1700000003 => "愛はお金では買えない。  \nしかし、ブログの維持費は完全に無料にできる。  \n\nRDBを捨て去り、フラットファイルを選んだあの日から、  \n私たちの関係はよりシンプルに、そして疎結合になった。  \nこの愛は、Cloud Runのように自動的にスケールするだろう。"
+    ];
+
+    try {
+        foreach ($poems as $id => $body) {
+            $md_object = $bucket->object("posts/{$id}.md");
+            if (!$md_object->exists()) {
+                $bucket->upload($body, [
+                    'name' => "posts/{$id}.md",
+                    'metadata' => ['contentType' => 'text/markdown']
+                ]);
+            }
+        }
+        $bucket->upload(
+            json_encode($default_posts, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+            ['name' => 'posts.json']
+        );
+    } catch (Exception $e) {
+        // Fallback in case of storage emulator or connection error
+    }
+
+    return $default_posts;
 }
 
 // Save post metadata list back to GCS
@@ -388,7 +438,7 @@ $posts = load_posts_metadata($bucket);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serverless & FinOps Journal</title>
+    <title>私の愛のささやき - ポエムブログ</title>
     <!-- Premium Fonts: Lora (Serif) & Plus Jakarta Sans (Sans-serif) -->
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -994,8 +1044,8 @@ $posts = load_posts_metadata($bucket);
         <?php else: ?>
             <!-- TOP PAGE (POSTS LIST) -->
             <div class="hero">
-                <h1>Serverless & FinOps</h1>
-                <p>Cloud Run と GCS（Google Cloud Storage）だけで構築された、アクセスゼロなら維持費完全0円の極軽量サーバーレスブログ。</p>
+                <h1>私の愛のささやき</h1>
+                <p>おぉロミオ、どうしてあなたはロミオなの？アクセスゼロなら維持費完全0円！孤独な夜をサーバーレスが優しく包み込みます。</p>
             </div>
 
             <?php if (empty($posts)): ?>
@@ -1019,7 +1069,7 @@ $posts = load_posts_metadata($bucket);
                             <div style="display: flex; flex-direction: column; justify-content: center;">
                                 <div class="post-meta"><?= date('Y年m月d日', strtotime($post['date'])) ?></div>
                                 <h2 class="post-title"><?= htmlspecialchars($post['title']) ?></h2>
-                                <p class="post-desc">この記事を読んで、サーバーレス技術がいかに効率的で無駄のないシステムデザインと極限のFinOpsコスト削減を実現するかを学びましょう。</p>
+                                <p class="post-desc">今夜も届かない愛の言葉。この熱いパッションを込めて書いた最新ポエムをどうぞ。</p>
                                 <div>
                                     <span class="nav-btn" style="padding: 0.4rem 1.1rem; font-size: 0.8rem; border-color: var(--accent-color); color: var(--accent-color);">記事を読む →</span>
                                 </div>
@@ -1033,7 +1083,7 @@ $posts = load_posts_metadata($bucket);
     </main>
 
     <footer>
-        <p>&copy; <?= date('Y') ?> Serverless & FinOps Journal. Built with Cloud Run & Storage.</p>
+        <p>&copy; <?= date('Y') ?> 私の愛のささやき. Built with Cloud Run & Storage.</p>
     </footer>
 
 </body>
