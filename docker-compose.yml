@@ -7,6 +7,11 @@ services:
       - "4443:4443"
     command: -scheme http -public-host gcs-emulator:4443
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
 
   # 2. Custom GCS Flat-File CMS Application
   cms:
@@ -31,3 +36,8 @@ services:
       # Authorized administrator email (SHA-256 hash)
       - ADMIN_EMAIL_HASH=${ADMIN_EMAIL_HASH:-}
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
