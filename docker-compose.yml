@@ -4,7 +4,7 @@ services:
     image: fsouza/fake-gcs-server:latest
     container_name: gcs-emulator
     ports:
-      - "4443:4443"
+      - "127.0.0.1:4443:4443"
     command: -scheme http -public-host gcs-emulator:4443
     restart: always
     deploy:
@@ -20,7 +20,7 @@ services:
     depends_on:
       - gcs-emulator
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"
     environment:
       - PORT=80
       # Bucket names for data and media
