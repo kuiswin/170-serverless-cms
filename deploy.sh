@@ -64,6 +64,7 @@ gcloud run deploy ${SERVICE_NAME} \
     --allow-unauthenticated \
     --service-account=${SA_EMAIL} \
     --set-env-vars="GCS_BUCKET=${BUCKET_NAME},GCS_MEDIA_BUCKET=${MEDIA_BUCKET_NAME},GOOGLE_CLIENT_ID=your-google-client-id,GOOGLE_CLIENT_SECRET=your-google-client-secret,ADMIN_EMAIL_HASH=your-email-sha256-hash" \
+    --max-instances 5 \
     --session-affinity \
     --concurrency 100 \
     --cpu 1 \
