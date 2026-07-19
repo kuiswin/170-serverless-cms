@@ -29,6 +29,8 @@ try {
     $config = [];
     if (getenv('STORAGE_EMULATOR_HOST')) {
         $config['apiEndpoint'] = getenv('STORAGE_EMULATOR_HOST');
+        $config['projectId'] = 'local-project';
+        $config['shouldSignRequest'] = false;
     }
     $storage = new StorageClient($config);
     $bucket = $storage->bucket($bucket_name);
