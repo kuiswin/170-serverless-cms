@@ -52,13 +52,10 @@ gcloud storage buckets add-iam-policy-binding gs://${MEDIA_BUCKET_NAME} --member
 # Vertex AI へのアクセス権限
 gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:${SA_EMAIL}" --role="roles/aiplatform.user"
 
-# 5. コンテナのビルドとPush (Google Cloud Build)
-gcloud builds submit --tag ${REGION}-docker.pkg.dev/${PROJECT_ID}/${SERVICE_NAME}-repo/${SERVICE_NAME}:latest .
-
-# 6. Cloud Runへのデプロイ
+# 5. Cloud Runへのデプロイ (ソースコード直接ビルド＆デプロイ)
 # 作成した専用SAを割り当て、セッションアフィニティ、スロットリング有効状態でデプロイ
 gcloud run deploy ${SERVICE_NAME} \
-    --image ${REGION}-docker.pkg.dev/${PROJECT_ID}/${SERVICE_NAME}-repo/${SERVICE_NAME}:latest \
+    --source . \
     --platform managed \
     --region ${REGION} \
     --allow-unauthenticated \
