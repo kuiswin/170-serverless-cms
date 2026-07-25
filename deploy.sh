@@ -3,7 +3,7 @@ set -e
 
 # 各種パラメータの設定
 PROJECT_ID="your-google-cloud-project-id"
-REGION="asia-northeast1"
+REGION="us-central1" # Always Free 適用対象の米国中央リージョン
 SERVICE_NAME="serverless-cms"
 BUCKET_NAME="${PROJECT_ID}-cms-data"
 MEDIA_BUCKET_NAME="${PROJECT_ID}-cms-media"
@@ -53,18 +53,18 @@ gcloud storage buckets add-iam-policy-binding gs://${MEDIA_BUCKET_NAME} --member
 gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:${SA_EMAIL}" --role="roles/aiplatform.user"
 
 # 5. Cloud Runへのデプロイ (ソースコード直接ビルド＆デプロイ)
-# 作成した専用SAを割り当て、セッションアフィニティ、スロットリング有効状態でデプロイ
+# 作成した専用SAを割り当て、無料枠を最大化するリソース調整(0.08 vCPU / 128MiB)を適用してデプロイ
 gcloud run deploy ${SERVICE_NAME} \
     --source . \
     --platform managed \
     --region ${REGION} \
     --allow-unauthenticated \
     --service-account=${SA_EMAIL} \
-    --set-env-vars="GCS_BUCKET=${BUCKET_NAME},GCS_MEDIA_BUCKET=${MEDIA_BUCKET_NAME},GOOGLE_CLIENT_ID=your-google-client-id,GOOGLE_CLIENT_SECRET=your-google-client-secret,ADMIN_EMAIL_HASH=your-email-sha256-hash" \
+    --set-env-vars="GCS_BUCKET=${BUCKET_NAME},GCS_MEDIA_BUCKET=${MEDIA_BUCKET_NAME},GOOGLE_CLIENT_ID=your-google-client-id,GOOGLE_CLIENT_SECRET=your-google-client-secret,ADMIN_EMAIL_HASH=your-email-sha256-hash,ENABLE_IMAGE_GEN=true" \
     --max-instances 5 \
     --session-affinity \
     --concurrency 100 \
-    --cpu 1 \
-    --memory 1Gi
+    --cpu 0.08 \
+    --memory 128Mi
 
 echo "✅ デプロイが完了しました！"

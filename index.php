@@ -107,12 +107,56 @@ function load_posts_metadata($bucket) {
     return $default_posts;
 }
 
-// Save post metadata list back to GCS
-function save_posts_metadata($bucket, $metadata) {
-    $bucket->upload(
-        json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
-        ['name' => 'posts.json']
-    );
+// Save post metadata list back to GCS (with optimistic concurrency control, retry and re-merge logic)
+function save_posts_metadata($bucket, $metadata, $if_generation_match = null) {
+    $retry_count = 0;
+    $max_retries = 3;
+    $backoff_microseconds = 500000; // 0.5秒
+
+    while ($retry_count < $max_retries) {
+        $options = ['name' => 'posts.json'];
+        if ($if_generation_match !== null) {
+            $options['ifGenerationMatch'] = $if_generation_match;
+        }
+        try {
+            $bucket->upload(
+                json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+                $options
+            );
+            return true;
+        } catch (\Google\Cloud\Core\Exception\FailedPreconditionException $e) {
+            $retry_count++;
+            if ($retry_count >= $max_retries) {
+                error_log("GCS save_posts_metadata failed due to 412 FailedPreconditionException after retries.");
+                return false;
+            }
+            usleep($backoff_microseconds * $retry_count);
+            // 最新のメタデータと世代番号を取得・再マージしてロストアップデートを防ぐ
+            try {
+                $object = $bucket->object('posts.json');
+                if ($object->exists()) {
+                    $if_generation_match = $object->info()['generation'];
+                    $latest_json = $object->downloadAsString();
+                    $latest_posts = json_decode($latest_json, true) ?? [];
+                    
+                    // 自分の新しい投稿（idで照合）を最新配列にマージ
+                    $existing_ids = array_column($latest_posts, 'id');
+                    foreach ($metadata as $my_post) {
+                        if (!in_array($my_post['id'], $existing_ids, true)) {
+                            array_unshift($latest_posts, $my_post);
+                        }
+                    }
+                    $metadata = $latest_posts;
+                }
+            } catch (\Exception $ex) {
+                error_log("GCS re-merge on 412 failed: " . $ex->getMessage());
+            }
+        } catch (\Exception $e) {
+            error_log("GCS save_posts_metadata failed: " . $e->getMessage());
+            return false;
+        }
+    }
+    return false;
 }
 
 // Google OAuth 2.0 Helpers
@@ -182,8 +226,11 @@ function verify_id_token($id_token, $client_id) {
     return $verify;
 }
 
-// Generate featured image using Vertex AI (Gemini 3.1 Flash Image)
+// Generate featured image using Vertex AI (Gemini 3.1 Flash Image / Imagen 3)
 function generate_featured_image($title, $post_id, $media_bucket_name, $storage) {
+    if (getenv('ENABLE_IMAGE_GEN') === 'false' || getenv('ENABLE_IMAGE_GEN') === '0') {
+        return null;
+    }
     $opts = [
         'http' => [
             'method' => 'GET',
@@ -215,17 +262,16 @@ function generate_featured_image($title, $post_id, $media_bucket_name, $storage)
     }
 
     $region = 'us-central1';
-    $api_url = "https://{$region}-aiplatform.googleapis.com/v1/projects/{$project_id}/locations/{$region}/publishers/google/models/gemini-3.1-flash-image:generateContent";
+    $api_url = "https://{$region}-aiplatform.googleapis.com/v1/projects/{$project_id}/locations/{$region}/publishers/google/models/imagen-3.0-generate-001:predict";
     $prompt = "A high-quality, professional, modern blog post featured image, visually representing the topic: \"" . $title . "\". Aesthetic flat vector style, no text, no letters, no words, 16:9 aspect ratio.";
 
     $body = [
-        'contents' => [
-            [
-                'role' => 'user',
-                'parts' => [
-                    ['text' => $prompt]
-                ]
-            ]
+        'instances' => [
+            ['prompt' => $prompt]
+        ],
+        'parameters' => [
+            'sampleCount' => 1,
+            'aspectRatio' => '16:9'
         ]
     ];
 
@@ -241,24 +287,19 @@ function generate_featured_image($title, $post_id, $media_bucket_name, $storage)
     $response = @file_get_contents($api_url, false, $context_post);
 
     if ($response === false) {
-        error_log('Vertex AI: API request failed.');
+        error_log('Vertex AI Imagen 3: API request failed.');
         return null;
     }
 
     $response_data = json_decode($response, true);
     $base64_image = '';
     
-    if (isset($response_data['candidates'][0]['content']['parts'])) {
-        foreach ($response_data['candidates'][0]['content']['parts'] as $part) {
-            if (isset($part['inlineData']['data'])) {
-                $base64_image = $part['inlineData']['data'];
-                break;
-            }
-        }
+    if (isset($response_data['predictions'][0]['bytesBase64Encoded'])) {
+        $base64_image = $response_data['predictions'][0]['bytesBase64Encoded'];
     }
 
     if (empty($base64_image)) {
-        error_log('Vertex AI: No image bytes returned.');
+        error_log('Vertex AI Imagen 3: No image bytes returned.');
         return null;
     }
 
