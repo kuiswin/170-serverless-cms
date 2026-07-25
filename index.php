@@ -107,11 +107,19 @@ function load_posts_metadata($bucket) {
     return $default_posts;
 }
 
-// Save post metadata list back to GCS (with optimistic concurrency control, retry and re-merge logic)
+/**
+ * GCSへの記事メタデータ一覧（posts.json）保存処理
+ * 
+ * 楽観的排他制御（Optimistic Concurrency Control）を実装：
+ * 1. GCSの世代番号（Generation Number）および ifGenerationMatch を利用して同時上書きを防止
+ * 2. 競合検知時（412 Precondition Failed）は指数バックオフ（0.5秒×回数）で一時待機
+ * 3. 最新の posts.json を取得し直して自分の新着投稿を再マージ（ロストアップデート防止）
+ * 4. リトライ上限超過時は HTTP 409 (Conflict) を設定して false を返却
+ */
 function save_posts_metadata($bucket, $metadata, $if_generation_match = null) {
     $retry_count = 0;
     $max_retries = 3;
-    $backoff_microseconds = 500000; // 0.5秒
+    $backoff_microseconds = 500000; // 0.5秒待機
 
     while ($retry_count < $max_retries) {
         $options = ['name' => 'posts.json'];
@@ -119,20 +127,25 @@ function save_posts_metadata($bucket, $metadata, $if_generation_match = null) {
             $options['ifGenerationMatch'] = $if_generation_match;
         }
         try {
+            // GCSへ書き込み試行
             $bucket->upload(
                 json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
                 $options
             );
             return true;
         } catch (\Google\Cloud\Core\Exception\FailedPreconditionException $e) {
+            // 同時書き込み競合（412 Precondition Failed）が発生した場合
             $retry_count++;
             if ($retry_count >= $max_retries) {
+                // リトライ上限到達時：HTTP 409 Conflictレスポンスコードを設定
                 http_response_code(409);
-                error_log("GCS save_posts_metadata failed due to 412 FailedPreconditionException after retries.");
+                error_log("GCS save_posts_metadata: 412 FailedPreconditionException によりリトライ上限に達しました。");
                 return false;
             }
+            // 指数バックオフ待機
             usleep($backoff_microseconds * $retry_count);
-            // 最新のメタデータと世代番号を取得・再マージしてロストアップデートを防ぐ
+
+            // GCSから最新の posts.json 世代番号とデータを取得して再マージ（ロストアップデート防止）
             try {
                 $object = $bucket->object('posts.json');
                 if ($object->exists()) {
@@ -150,7 +163,7 @@ function save_posts_metadata($bucket, $metadata, $if_generation_match = null) {
                     $metadata = $latest_posts;
                 }
             } catch (\Exception $ex) {
-                error_log("GCS re-merge on 412 failed: " . $ex->getMessage());
+                error_log("GCS re-merge failed: " . $ex->getMessage());
             }
         } catch (\Exception $e) {
             error_log("GCS save_posts_metadata failed: " . $e->getMessage());
