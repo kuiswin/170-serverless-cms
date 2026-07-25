@@ -127,6 +127,7 @@ function save_posts_metadata($bucket, $metadata, $if_generation_match = null) {
         } catch (\Google\Cloud\Core\Exception\FailedPreconditionException $e) {
             $retry_count++;
             if ($retry_count >= $max_retries) {
+                http_response_code(409);
                 error_log("GCS save_posts_metadata failed due to 412 FailedPreconditionException after retries.");
                 return false;
             }
@@ -430,10 +431,13 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST' && $is_logged_
                 'date' => date('Y-m-d H:i:s'),
                 'image_path' => $image_path
             ]);
-            save_posts_metadata($bucket, $posts);
-            
-            header('Location: index.php');
-            exit;
+            if (!save_posts_metadata($bucket, $posts)) {
+                http_response_code(409);
+                $error = 'エラー: 同時更新による競合が発生しました。時間を置いて再度お試しください。';
+            } else {
+                header('Location: index.php');
+                exit;
+            }
         } catch (Exception $e) {
             $error = '記事の保存に失敗しました: ' . $e->getMessage();
         }
