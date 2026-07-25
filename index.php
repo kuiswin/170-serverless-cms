@@ -240,7 +240,7 @@ function verify_id_token($id_token, $client_id) {
     return $verify;
 }
 
-// Generate featured image using Vertex AI (Gemini 3.1 Flash Image / Imagen 3)
+// Generate featured image using Vertex AI Imagen 3 (imagen-3.0-generate-001)
 function generate_featured_image($title, $post_id, $media_bucket_name, $storage) {
     if (getenv('ENABLE_IMAGE_GEN') === 'false' || getenv('ENABLE_IMAGE_GEN') === '0') {
         return null;
