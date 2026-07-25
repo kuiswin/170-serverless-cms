@@ -240,7 +240,7 @@ function verify_id_token($id_token, $client_id) {
     return $verify;
 }
 
-// Generate featured image using Vertex AI Imagen 3 (imagen-3.0-generate-001)
+// Generate featured image using Vertex AI Imagen 4 (imagen-4.0-generate-001)
 function generate_featured_image($title, $post_id, $media_bucket_name, $storage) {
     if (getenv('ENABLE_IMAGE_GEN') === 'false' || getenv('ENABLE_IMAGE_GEN') === '0') {
         return null;
@@ -276,7 +276,7 @@ function generate_featured_image($title, $post_id, $media_bucket_name, $storage)
     }
 
     $region = 'us-central1';
-    $api_url = "https://{$region}-aiplatform.googleapis.com/v1/projects/{$project_id}/locations/{$region}/publishers/google/models/imagen-3.0-generate-001:predict";
+    $api_url = "https://{$region}-aiplatform.googleapis.com/v1/projects/{$project_id}/locations/{$region}/publishers/google/models/imagen-4.0-generate-001:predict";
     $prompt = "A high-quality, professional, modern blog post featured image, visually representing the topic: \"" . $title . "\". Aesthetic flat vector style, no text, no letters, no words, 16:9 aspect ratio.";
 
     $body = [
@@ -301,7 +301,7 @@ function generate_featured_image($title, $post_id, $media_bucket_name, $storage)
     $response = @file_get_contents($api_url, false, $context_post);
 
     if ($response === false) {
-        error_log('Vertex AI Imagen 3: API request failed.');
+        error_log('Vertex AI Imagen 4: API request failed.');
         return null;
     }
 
@@ -313,7 +313,7 @@ function generate_featured_image($title, $post_id, $media_bucket_name, $storage)
     }
 
     if (empty($base64_image)) {
-        error_log('Vertex AI Imagen 3: No image bytes returned.');
+        error_log('Vertex AI Imagen 4: No image bytes returned.');
         return null;
     }
 
