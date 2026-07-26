@@ -11,6 +11,8 @@ MEDIA_BUCKET_NAME="${PROJECT_ID}-cms-media"
 SA_NAME="cms-sa"
 SA_EMAIL="${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 
+PROJECT_NUMBER=$(gcloud projects describe ${PROJECT_ID} --format="value(projectNumber)" 2>/dev/null || true)
+
 # OAuth 2.0 クライアントIDの設定 (自動取得できる場合は自動設定、不可の場合は既定値を使用)
 OAUTH_CLIENT_JSON=$(gcloud alpha iap oauth-clients list projects/${PROJECT_ID}/brands/${PROJECT_NUMBER} --format="json" 2>/dev/null || true)
 AUTO_CLIENT_ID=$(echo "${OAUTH_CLIENT_JSON}" | jq -r '.[0].name' 2>/dev/null | awk -F'/' '{print $NF}' || true)
