@@ -11,7 +11,15 @@ MEDIA_BUCKET_NAME="${PROJECT_ID}-cms-media"
 SA_NAME="cms-sa"
 SA_EMAIL="${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 
-GOOGLE_CLIENT_ID="757378940562-djqh3remqbljj40obqcf8iet1sq77cs8.apps.googleusercontent.com"
+# OAuth 2.0 クライアントIDの設定 (自動取得できる場合は自動設定、不可の場合は既定値を使用)
+OAUTH_CLIENT_JSON=$(gcloud alpha iap oauth-clients list projects/${PROJECT_ID}/brands/${PROJECT_NUMBER} --format="json" 2>/dev/null || true)
+AUTO_CLIENT_ID=$(echo "${OAUTH_CLIENT_JSON}" | jq -r '.[0].name' 2>/dev/null | awk -F'/' '{print $NF}' || true)
+
+if [ -n "${AUTO_CLIENT_ID}" ] && [ "${AUTO_CLIENT_ID}" != "null" ]; then
+    GOOGLE_CLIENT_ID="${AUTO_CLIENT_ID}"
+else
+    GOOGLE_CLIENT_ID="757378940562-djqh3remqbljj40obqcf8iet1sq77cs8.apps.googleusercontent.com"
+fi
 MY_EMAIL=$(gcloud config get-value account)
 ADMIN_EMAIL_HASH=$(echo -n "${MY_EMAIL}" | tr '[:upper:]' '[:lower:]' | sha256sum | awk '{print $1}')
 
