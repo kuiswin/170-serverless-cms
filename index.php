@@ -435,7 +435,7 @@ if (isset($_GET['error'])) {
 }
 
 // 1. Handle Login
-if ($action === 'login') {
+if ($action === 'login' && empty($error)) {
     $use_fallback = isset($_GET['fallback']) || !$is_oauth_configured;
     
     if ($use_fallback) {
