@@ -11,7 +11,7 @@ MEDIA_BUCKET_NAME="${PROJECT_ID}-cms-media"
 SA_NAME="cms-sa"
 SA_EMAIL="${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 
-MY_EMAIL="kazuloveyoulovemelove@gmail.com"
+MY_EMAIL=$(gcloud config get-value account)
 ADMIN_EMAIL_HASH=$(echo -n "${MY_EMAIL}" | tr '[:upper:]' '[:lower:]' | sha256sum | awk '{print $1}')
 
 echo "=== 1. ビルド用サービスアカウントの権限修正 ==="
