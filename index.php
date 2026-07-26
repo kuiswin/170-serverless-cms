@@ -334,10 +334,46 @@ function generate_featured_image($title, $post_id, $media_bucket_name, $storage)
     }
 }
 
+// Helper functions for stateless auth cookies (used in production for zero-scale persistence)
+function generate_auth_token($email, $secret_hash) {
+    $exp = time() + (86400 * 7); // 7-day expiration
+    $data = "{$email}|{$exp}";
+    $sig = hash_hmac('sha256', $data, $secret_hash);
+    return base64_encode("{$data}|{$sig}");
+}
+
+function verify_auth_token($token_str, $secret_hash) {
+    if (empty($token_str) || empty($secret_hash)) return false;
+    $decoded = base64_decode($token_str, true);
+    if (!$decoded) return false;
+    $parts = explode('|', $decoded);
+    if (count($parts) !== 3) return false;
+    list($email, $exp, $sig) = $parts;
+    if ((int)$exp < time()) return false;
+    $expected_sig = hash_hmac('sha256', "{$email}|{$exp}", $secret_hash);
+    if (!hash_equals($expected_sig, $sig)) return false;
+    return ['email' => $email];
+}
+
 // Router actions
 $action = $_GET['action'] ?? '';
 $error = '';
-$is_logged_in = $_SESSION['logged_in'] ?? false;
+
+// Environment-variable driven dual auth checking
+if ($is_oauth_configured) {
+    // Production Mode: Stateless HMAC-signed Cookie (persists across Cloud Run zero-scaling)
+    $auth_cookie = $_COOKIE['cms_auth_token'] ?? '';
+    $verified = verify_auth_token($auth_cookie, $admin_email_hash);
+    if ($verified) {
+        $is_logged_in = true;
+        $_SESSION['admin_email'] = $verified['email'];
+    } else {
+        $is_logged_in = false;
+    }
+} else {
+    // Local Fallback Mode: Simple PHP Session
+    $is_logged_in = $_SESSION['logged_in'] ?? false;
+}
 
 // Google OAuth callback processing (intercepts normal requests)
 if (isset($_GET['code']) && isset($_GET['state'])) {
@@ -361,6 +397,17 @@ if (isset($_GET['code']) && isset($_GET['state'])) {
                     if ($email_hash === $target_hash) {
                         $_SESSION['logged_in'] = true;
                         $_SESSION['admin_email'] = $email;
+                        
+                        // Set stateless HMAC signed cookie for Cloud Run zero-scale persistence
+                        $auth_token = generate_auth_token($email, $admin_email_hash);
+                        setcookie('cms_auth_token', $auth_token, [
+                            'expires' => time() + (86400 * 7),
+                            'path' => '/',
+                            'secure' => true,
+                            'httponly' => true,
+                            'samesite' => 'Lax'
+                        ]);
+
                         header('Location: index.php?action=admin');
                         exit;
                     } else {
@@ -413,6 +460,13 @@ if ($action === 'login') {
 if ($action === 'logout') {
     $_SESSION['logged_in'] = false;
     unset($_SESSION['admin_email']);
+    setcookie('cms_auth_token', '', [
+        'expires' => time() - 3600,
+        'path' => '/',
+        'secure' => true,
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
     header('Location: index.php');
     exit;
 }
