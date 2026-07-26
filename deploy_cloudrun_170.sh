@@ -48,10 +48,3 @@ gcloud run deploy ${SERVICE_NAME} \
     --memory 256Mi
 
 echo "=== デプロイ完了 ==="
-SERVICE_URL=$(gcloud run services describe ${SERVICE_NAME} --project=${PROJECT_ID} --region=${REGION} --format="value(status.url)")
-echo "========================================================"
-echo "🎉 デプロイ完了！あなたのブログURL: ${SERVICE_URL}"
-echo "※ Google ログインの 'redirect_uri_mismatch' エラーを防ぐため、"
-echo "   上記URLを Google Auth Platform の『承認済みの JavaScript 生成元』"
-echo "   および『承認済みのリダイレクト URI』に追加して保存してください。"
-echo "========================================================"
