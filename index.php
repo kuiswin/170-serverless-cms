@@ -15,13 +15,15 @@ session_start();
 
 $bucket_name = getenv('GCS_BUCKET');
 $media_bucket_name = getenv('GCS_MEDIA_BUCKET') ?: $bucket_name; // Fallback to main bucket if media bucket not set
-$admin_password = getenv('ADMIN_PASSWORD') ?: 'admin'; // Default password (dev fallback)
+$admin_password = (getenv('ADMIN_PASSWORD') !== false && getenv('ADMIN_PASSWORD') !== '') ? getenv('ADMIN_PASSWORD') : 'admin'; // Default password (dev fallback)
 
-// Google OAuth 2.0 Credentials
+// Google OAuth 2.0 Credentials / GCP Cloud Run Environment Detection
 $google_client_id = getenv('GOOGLE_CLIENT_ID');
 $google_client_secret = getenv('GOOGLE_CLIENT_SECRET');
 $admin_email_hash = getenv('ADMIN_EMAIL_HASH');
-$is_oauth_configured = !empty($google_client_id) && !empty($google_client_secret) && !empty($admin_email_hash);
+// Auto-detect Cloud Run (K_SERVICE) or configured OAuth credentials / Admin Email Hash
+$is_gcp_environment = !empty(getenv('K_SERVICE')) || !empty($admin_email_hash);
+$is_oauth_configured = $is_gcp_environment || (!empty($google_client_id) && !empty($google_client_secret));
 
 // Initialize GCS client
 // SDK automatically respects STORAGE_EMULATOR_HOST if set in local docker environment
@@ -1010,16 +1012,16 @@ $posts = load_posts_metadata($bucket);
                         <span>🛡️</span> 認証システムの設計と動作条件
                     </p>
                     <div style="margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px dashed var(--border-color);">
-                        <strong style="color: #a27b38; display: flex; align-items: center; gap: 0.25rem; margin-bottom: 0.25rem;">
-                            <span>💻</span> ローカル開発環境 (現在)
+                        <strong style="color: <?= !$is_gcp_environment ? '#a27b38' : 'var(--text-secondary)' ?>; display: flex; align-items: center; gap: 0.25rem; margin-bottom: 0.25rem;">
+                            <span>💻</span> ローカル開発環境 <?= !$is_gcp_environment ? '(現在)' : '' ?>
                         </strong>
                         <ul style="padding-left: 1.25rem; margin: 0;">
                             <li><code>docker-compose.yml</code> 内の環境変数 <code>ADMIN_PASSWORD</code> (デフォルト: <code>admin</code>) とフォームに入力された値を照合してログインします。</li>
                         </ul>
                     </div>
                     <div>
-                        <strong style="color: #1a73e8; display: flex; align-items: center; gap: 0.25rem; margin-bottom: 0.25rem;">
-                            <span>☁️</span> Google Cloud (本番) 環境
+                        <strong style="color: <?= $is_gcp_environment ? '#1a73e8' : 'var(--text-secondary)' ?>; display: flex; align-items: center; gap: 0.25rem; margin-bottom: 0.25rem;">
+                            <span>☁️</span> Google Cloud (本番) 環境 <?= $is_gcp_environment ? '(現在)' : '' ?>
                         </strong>
                         <ul style="padding-left: 1.25rem; margin: 0;">
                             <li>Googleアカウントを用いたセキュアな認証（OIDC）に自動で切り替わります。</li>
