@@ -48,7 +48,7 @@ gcloud run deploy ${SERVICE_NAME} \
     --memory 256Mi
 
 echo "=== デプロイ完了 ==="
-SERVICE_URL=$(gcloud run services describe ${SERVICE_NAME} --region=${REGION} --format="value(status.url)")
+SERVICE_URL=$(gcloud run services describe ${SERVICE_NAME} --project=${PROJECT_ID} --region=${REGION} --format="value(status.url)")
 echo "========================================================"
 echo "🎉 デプロイ完了！あなたのブログURL: ${SERVICE_URL}"
 echo "※ Google ログインの 'redirect_uri_mismatch' エラーを防ぐため、"
