@@ -11,6 +11,7 @@ MEDIA_BUCKET_NAME="${PROJECT_ID}-cms-media"
 SA_NAME="cms-sa"
 SA_EMAIL="${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 
+GOOGLE_CLIENT_ID="757378940562-djqh3remqbljj40obqcf8iet1sq77cs8.apps.googleusercontent.com"
 MY_EMAIL=$(gcloud config get-value account)
 ADMIN_EMAIL_HASH=$(echo -n "${MY_EMAIL}" | tr '[:upper:]' '[:lower:]' | sha256sum | awk '{print $1}')
 
@@ -30,7 +31,7 @@ gcloud run deploy ${SERVICE_NAME} \
     --region ${REGION} \
     --allow-unauthenticated \
     --service-account=${SA_EMAIL} \
-    --set-env-vars="GCS_BUCKET=${BUCKET_NAME},GCS_MEDIA_BUCKET=${MEDIA_BUCKET_NAME},ADMIN_EMAIL_HASH=${ADMIN_EMAIL_HASH}" \
+    --set-env-vars="GCS_BUCKET=${BUCKET_NAME},GCS_MEDIA_BUCKET=${MEDIA_BUCKET_NAME},GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID},ADMIN_EMAIL_HASH=${ADMIN_EMAIL_HASH}" \
     --max-instances 5 \
     --concurrency 1 \
     --cpu 0.08 \
