@@ -3,7 +3,7 @@ set -e
 
 source /root/google-cloud-sdk/path.bash.inc
 
-PROJECT_ID="qiita-app-170"
+PROJECT_ID=$(gcloud config get-value project 2>/dev/null || echo "qiita-app-170")
 REGION="us-central1"
 SERVICE_NAME="serverless-cms"
 BUCKET_NAME="${PROJECT_ID}-cms-data"
