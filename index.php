@@ -199,15 +199,18 @@ function build_oauth_url($state, $client_id, $redirect_uri) {
 
 function exchange_oauth_code($code, $client_id, $client_secret, $redirect_uri) {
     $ch = curl_init('https://oauth2.googleapis.com/token');
+    $fields = [
+        'code' => $code,
+        'client_id' => $client_id,
+        'redirect_uri' => $redirect_uri,
+        'grant_type' => 'authorization_code',
+    ];
+    if (!empty($client_secret)) {
+        $fields['client_secret'] = $client_secret;
+    }
     curl_setopt_array($ch, [
         CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => http_build_query([
-            'code' => $code,
-            'client_id' => $client_id,
-            'client_secret' => $client_secret,
-            'redirect_uri' => $redirect_uri,
-            'grant_type' => 'authorization_code',
-        ]),
+        CURLOPT_POSTFIELDS => http_build_query($fields),
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HEADER => false,
         CURLOPT_TIMEOUT => 10,
@@ -277,63 +280,95 @@ function generate_featured_image($title, $post_id, $media_bucket_name, $storage)
         return null;
     }
 
-    $region = 'us-central1';
-    $api_url = "https://{$region}-aiplatform.googleapis.com/v1/projects/{$project_id}/locations/{$region}/publishers/google/models/imagen-4.0-generate-001:predict";
-    $prompt = "A high-quality, professional, modern blog post featured image, visually representing the topic: \"" . $title . "\". Aesthetic flat vector style, no text, no letters, no words, 16:9 aspect ratio.";
-
-    $body = [
-        'instances' => [
-            ['prompt' => $prompt]
-        ],
-        'parameters' => [
-            'sampleCount' => 1,
-            'aspectRatio' => '16:9'
-        ]
+    $location = 'global';
+    // Models to try in order (Primary: Nano Banana 2 Lite on global location endpoint)
+    $models = [
+        'gemini-3.1-flash-lite-image',
+        'gemini-3.1-flash-image',
+        'gemini-2.5-flash'
     ];
 
-    $opts_post = [
-        'http' => [
-            'method' => 'POST',
-            'header' => "Authorization: Bearer {$access_token}\r\nContent-Type: application/json\r\n",
-            'content' => json_encode($body),
-            'timeout' => 30
-        ]
-    ];
-    $context_post = stream_context_create($opts_post);
-    $response = @file_get_contents($api_url, false, $context_post);
+    foreach ($models as $model_id) {
+        // Use global location endpoint for Gemini 3.1 Flash Lite Image on Vertex AI
+        $api_url = "https://aiplatform.googleapis.com/v1/projects/{$project_id}/locations/{$location}/publishers/google/models/{$model_id}:generateContent";
+        
+        $prompt = "記事タイトル「" . $title . "」のテーマにふさわしい、美しくモダンな16:9のアイキャッチ用SVGイラスト画像を作成してください。必ず <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1600 900\"> から始まる完全なSVGコードのみを出力し、説明文やテキストは一切含めないでください。";
+        $body = [
+            'contents' => [
+                [
+                    'role' => 'user',
+                    'parts' => [
+                        ['text' => $prompt]
+                    ]
+                ]
+            ]
+        ];
 
-    if ($response === false) {
-        error_log('Vertex AI Imagen 4: API request failed.');
-        return null;
+        $opts_post = [
+            'http' => [
+                'method' => 'POST',
+                'header' => "Authorization: Bearer {$access_token}\r\nContent-Type: application/json\r\n",
+                'content' => json_encode($body),
+                'timeout' => 30,
+                'ignore_errors' => true
+            ]
+        ];
+        $context_post = stream_context_create($opts_post);
+        $response = @file_get_contents($api_url, false, $context_post);
+
+        if ($response !== false) {
+            $response_data = json_decode($response, true);
+            
+            // 1. Check for Base64 image bytes (Nano Banana / Imagen)
+            $extracted_b64 = $response_data['predictions'][0]['bytesBase64Encoded']
+                ?? $response_data['candidates'][0]['content']['parts'][0]['inlineData']['data']
+                ?? $response_data['candidates'][0]['content']['parts'][0]['inline_data']['data']
+                ?? '';
+
+            if (!empty($extracted_b64)) {
+                $image_bytes = base64_decode($extracted_b64);
+                $image_filename = "media/{$post_id}.jpg";
+                try {
+                    $media_bucket = $storage->bucket($media_bucket_name);
+                    $media_bucket->upload($image_bytes, [
+                        'name' => $image_filename,
+                        'metadata' => ['contentType' => 'image/jpeg']
+                    ]);
+                    error_log("Vertex AI Image Gen Success (JPG): {$model_id}");
+                    return $image_filename;
+                } catch (Exception $e) {
+                    error_log("Vertex AI GCS Save Error: " . $e->getMessage());
+                }
+            }
+
+            // 2. Check for SVG XML string response (Gemini Flash vector generation)
+            $text_content = $response_data['candidates'][0]['content']['parts'][0]['text'] ?? '';
+            if (!empty($text_content)) {
+                // Extract SVG string
+                if (preg_match('/<svg[\s\S]*?<\/svg>/i', $text_content, $matches)) {
+                    $svg_xml = $matches[0];
+                    $image_filename = "media/{$post_id}.svg";
+                    try {
+                        $media_bucket = $storage->bucket($media_bucket_name);
+                        $media_bucket->upload($svg_xml, [
+                            'name' => $image_filename,
+                            'metadata' => ['contentType' => 'image/svg+xml']
+                        ]);
+                        error_log("Vertex AI Image Gen Success (SVG): {$model_id}");
+                        return $image_filename;
+                    } catch (Exception $e) {
+                        error_log("Vertex AI GCS SVG Save Error: " . $e->getMessage());
+                    }
+                }
+            }
+            error_log("Vertex AI Model {$model_id} Response mismatch: " . substr($response, 0, 300));
+        } else {
+            error_log("Vertex AI Model {$model_id} HTTP request failed.");
+        }
     }
 
-    $response_data = json_decode($response, true);
-    $base64_image = '';
-    
-    if (isset($response_data['predictions'][0]['bytesBase64Encoded'])) {
-        $base64_image = $response_data['predictions'][0]['bytesBase64Encoded'];
-    }
-
-    if (empty($base64_image)) {
-        error_log('Vertex AI Imagen 4: No image bytes returned.');
-        return null;
-    }
-
-    $image_bytes = base64_decode($base64_image);
-    $image_filename = "media/{$post_id}.jpg";
-    
-    try {
-        $media_bucket = $storage->bucket($media_bucket_name);
-        $media_bucket->upload($image_bytes, [
-            'name' => $image_filename,
-            'metadata' => ['contentType' => 'image/jpeg']
-        ]);
-        error_log("Vertex AI: Successfully generated and uploaded featured image: {$image_filename}");
-        return $image_filename;
-    } catch (Exception $e) {
-        error_log("Vertex AI: Failed to save image to GCS: " . $e->getMessage());
-        return null;
-    }
+    error_log('Vertex AI Image Gen: All model attempts failed.');
+    return null;
 }
 
 // Helper functions for stateless auth cookies (used in production for zero-scale persistence)
@@ -419,7 +454,8 @@ if (isset($_GET['code']) && isset($_GET['state'])) {
                     $error = 'ID トークンの検証に失敗しました。';
                 }
             } else {
-                $error = '認可コードからアクセストークンへの変換に失敗しました。';
+                $detail = $token_data['error_description'] ?? ($token_data['error'] ?? '不明なエラー');
+                $error = '認可コードからアクセストークンへの変換に失敗しました: ' . htmlspecialchars($detail);
             }
         } else {
             $error = 'セキュリティチェックエラー (CSRF トークンの不一致)。';

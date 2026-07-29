@@ -3,16 +3,23 @@ set -e
 
 source /root/google-cloud-sdk/path.bash.inc
 
-PROJECT_ID="qiita-app-170"
+if [ -z "${PROJECT_ID}" ]; then
+    PROJECT_ID="qiita-app-170-$(date +%Y%m%d%H%M%S)"
+fi
+BILLING_ACCOUNT=$(gcloud beta billing accounts list --format="value(name)" 2>/dev/null | head -n 1)
+
+echo "=== 1. プロジェクト作成 & 請求紐付け & API有効化 (${PROJECT_ID}) ==="
+gcloud projects create ${PROJECT_ID} --name="Serverless CMS 170" --quiet || true
+gcloud beta billing projects link ${PROJECT_ID} --billing-account=${BILLING_ACCOUNT} --quiet || true
+gcloud config set project ${PROJECT_ID} --quiet
+
 REGION="us-central1"
 SERVICE_NAME="serverless-cms"
 BUCKET_NAME="${PROJECT_ID}-cms-data"
 MEDIA_BUCKET_NAME="${PROJECT_ID}-cms-media"
-MY_EMAIL=$(gcloud config get-value account)
+MY_EMAIL=$(gcloud config get-value account 2>/dev/null || echo "user@example.com")
 
-echo "=== 1. 設定 & API有効化 ==="
-gcloud config set project ${PROJECT_ID}
-gcloud services enable run.googleapis.com storage.googleapis.com artifactregistry.googleapis.com aiplatform.googleapis.com iap.googleapis.com
+gcloud services enable run.googleapis.com storage.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com aiplatform.googleapis.com iap.googleapis.com --quiet
 
 echo "=== 2. GCS バケット作成 ==="
 gcloud storage buckets create gs://${BUCKET_NAME} --location=${REGION} --uniform-bucket-level-access || true
