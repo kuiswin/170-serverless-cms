@@ -245,8 +245,8 @@ function verify_id_token($id_token, $client_id) {
     return $verify;
 }
 
-// Generate featured image using Vertex AI Imagen 4 (imagen-4.0-generate-001)
-function generate_featured_image($title, $post_id, $media_bucket_name, $storage) {
+// Generate featured image using Vertex AI Imagen 3 / 4 (pure JPEG illustration)
+function generate_featured_image($title, $content, $post_id, $media_bucket_name, $storage) {
     if (getenv('ENABLE_IMAGE_GEN') === 'false' || getenv('ENABLE_IMAGE_GEN') === '0') {
         return null;
     }
@@ -280,29 +280,41 @@ function generate_featured_image($title, $post_id, $media_bucket_name, $storage)
         return null;
     }
 
-    $location = 'global';
-    // Models to try in order (Primary: Nano Banana 2 Lite on global location endpoint)
+    $summary = mb_substr(strip_tags($content), 0, 300);
+    $prompt = "A professional, high-end 16:9 featured header image illustration for a blog post titled '{$title}'. Story context: '{$summary}'. Aesthetic digital art, rich colors, cinematic lighting, 4k resolution, no text overlay.";
+
+    // Vertex AI Models to try (Primary: Imagen 3 / Imagen 4)
     $models = [
-        'gemini-3.1-flash-lite-image',
-        'gemini-3.1-flash-image',
-        'gemini-2.5-flash'
+        'imagen-3.0-generate-002',
+        'imagen-3.0-fast-generate-001',
+        'gemini-3.1-flash-lite-image'
     ];
 
     foreach ($models as $model_id) {
-        // Use global location endpoint for Gemini 3.1 Flash Lite Image on Vertex AI
-        $api_url = "https://aiplatform.googleapis.com/v1/projects/{$project_id}/locations/{$location}/publishers/google/models/{$model_id}:generateContent";
-        
-        $prompt = "記事タイトル「" . $title . "」のテーマにふさわしい、美しくモダンな16:9のアイキャッチ用SVGイラスト画像を作成してください。必ず <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1600 900\"> から始まる完全なSVGコードのみを出力し、説明文やテキストは一切含めないでください。";
+        $location = (strpos($model_id, 'imagen') !== false) ? 'us-central1' : 'global';
+        $api_url = "https://{$location}-aiplatform.googleapis.com/v1/projects/{$project_id}/locations/{$location}/publishers/google/models/{$model_id}:predict";
+        if (strpos($model_id, 'gemini') !== false) {
+            $api_url = "https://aiplatform.googleapis.com/v1/projects/{$project_id}/locations/global/publishers/google/models/{$model_id}:generateContent";
+        }
+
         $body = [
-            'contents' => [
-                [
-                    'role' => 'user',
-                    'parts' => [
-                        ['text' => $prompt]
-                    ]
-                ]
+            'instances' => [
+                ['prompt' => $prompt]
+            ],
+            'parameters' => [
+                'sampleCount' => 1,
+                'aspectRatio' => '16:9',
+                'outputOptions' => ['mimeType' => 'image/jpeg']
             ]
         ];
+
+        if (strpos($model_id, 'gemini') !== false) {
+            $body = [
+                'contents' => [
+                    ['role' => 'user', 'parts' => [['text' => $prompt]]]
+                ]
+            ];
+        }
 
         $opts_post = [
             'http' => [
@@ -319,7 +331,6 @@ function generate_featured_image($title, $post_id, $media_bucket_name, $storage)
         if ($response !== false) {
             $response_data = json_decode($response, true);
             
-            // 1. Check for Base64 image bytes (Nano Banana / Imagen)
             $extracted_b64 = $response_data['predictions'][0]['bytesBase64Encoded']
                 ?? $response_data['candidates'][0]['content']['parts'][0]['inlineData']['data']
                 ?? $response_data['candidates'][0]['content']['parts'][0]['inline_data']['data']
@@ -340,27 +351,6 @@ function generate_featured_image($title, $post_id, $media_bucket_name, $storage)
                     error_log("Vertex AI GCS Save Error: " . $e->getMessage());
                 }
             }
-
-            // 2. Check for SVG XML string response (Gemini Flash vector generation)
-            $text_content = $response_data['candidates'][0]['content']['parts'][0]['text'] ?? '';
-            if (!empty($text_content)) {
-                // Extract SVG string
-                if (preg_match('/<svg[\s\S]*?<\/svg>/i', $text_content, $matches)) {
-                    $svg_xml = $matches[0];
-                    $image_filename = "media/{$post_id}.svg";
-                    try {
-                        $media_bucket = $storage->bucket($media_bucket_name);
-                        $media_bucket->upload($svg_xml, [
-                            'name' => $image_filename,
-                            'metadata' => ['contentType' => 'image/svg+xml']
-                        ]);
-                        error_log("Vertex AI Image Gen Success (SVG): {$model_id}");
-                        return $image_filename;
-                    } catch (Exception $e) {
-                        error_log("Vertex AI GCS SVG Save Error: " . $e->getMessage());
-                    }
-                }
-            }
             error_log("Vertex AI Model {$model_id} Response mismatch: " . substr($response, 0, 300));
         } else {
             error_log("Vertex AI Model {$model_id} HTTP request failed.");
@@ -368,6 +358,8 @@ function generate_featured_image($title, $post_id, $media_bucket_name, $storage)
     }
 
     error_log('Vertex AI Image Gen: All model attempts failed.');
+    return null;
+}
     return null;
 }
 
@@ -525,8 +517,8 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST' && $is_logged_
                 'metadata' => ['contentType' => 'text/markdown']
             ]);
             
-            // Try to generate AI featured image
-            $image_path = generate_featured_image($title, $post_id, $media_bucket_name, $storage);
+            // Try to generate AI featured image (using title + markdown content)
+            $image_path = generate_featured_image($title, $markdown, $post_id, $media_bucket_name, $storage);
             
             // Update posts.json metadata list
             $posts = load_posts_metadata($bucket);
