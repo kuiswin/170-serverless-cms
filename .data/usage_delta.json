@@ -1,59 +1,59 @@
 {
   "project_id": "ferrous-iridium-286000",
-  "measured_at": "2026-08-01T05:17:00.352194+00:00",
-  "data_since": "2026-08-01T01:41:00.001Z",
-  "data_until": "2026-08-01T05:05:00Z",
-  "actual_days_measured": 0.1,
+  "measured_at": "2026-08-01T05:26:19.816176+00:00",
+  "data_since": "2026-08-01T05:17:00.001Z",
+  "data_until": "2026-08-01T05:22:00Z",
+  "actual_days_measured": 0.0,
   "time_matrix": {
     "1_minute": {
       "window_minutes": 1,
-      "gcs_read_ops": 0.0024,
-      "gcs_write_ops": 0.0003,
+      "gcs_read_ops": 0.0001,
+      "gcs_write_ops": 0.0,
       "image_gen_count": 0.0,
       "text_input_tokens": 0.0,
       "query_tb_scanned": 0.0,
-      "cpu_seconds": 0.0028,
-      "request_count": 0.0008
+      "request_count": 0.0,
+      "cpu_seconds": 0.0005
     },
     "10_minutes": {
       "window_minutes": 10,
-      "gcs_read_ops": 0.0238,
-      "gcs_write_ops": 0.0025,
-      "image_gen_count": 0.0002,
-      "text_input_tokens": 0.0001,
+      "gcs_read_ops": 0.0012,
+      "gcs_write_ops": 0.0,
+      "image_gen_count": 0.0,
+      "text_input_tokens": 0.0,
       "query_tb_scanned": 0.0,
-      "cpu_seconds": 0.0281,
-      "request_count": 0.0081
+      "request_count": 0.0005,
+      "cpu_seconds": 0.0049
     },
     "1_hour": {
       "window_minutes": 60,
-      "gcs_read_ops": 0.14,
-      "gcs_write_ops": 0.02,
+      "gcs_read_ops": 0.01,
+      "gcs_write_ops": 0.0,
       "image_gen_count": 0.0,
       "text_input_tokens": 0.0,
       "query_tb_scanned": 0.0,
-      "cpu_seconds": 0.17,
-      "request_count": 0.05
+      "request_count": 0.0,
+      "cpu_seconds": 0.03
     },
     "1_day": {
       "window_minutes": 1440,
-      "gcs_read_ops": 3.4,
-      "gcs_write_ops": 0.4,
+      "gcs_read_ops": 0.2,
+      "gcs_write_ops": 0.0,
       "image_gen_count": 0.0,
       "text_input_tokens": 0.0,
       "query_tb_scanned": 0.0,
-      "cpu_seconds": 4.0,
-      "request_count": 1.2
+      "request_count": 0.1,
+      "cpu_seconds": 0.7
     },
     "30_days": {
       "window_minutes": 43200,
-      "gcs_read_ops": 103.0,
-      "gcs_write_ops": 11.0,
-      "image_gen_count": 1.0,
-      "text_input_tokens": 0.5,
+      "gcs_read_ops": 5.0,
+      "gcs_write_ops": 0.0,
+      "image_gen_count": 0.0,
+      "text_input_tokens": 0.0,
       "query_tb_scanned": 0.0,
-      "cpu_seconds": 121.19,
-      "request_count": 35.0
+      "request_count": 2.0,
+      "cpu_seconds": 21.22
     }
   }
 }
