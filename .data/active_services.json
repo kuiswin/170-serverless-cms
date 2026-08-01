@@ -1,0 +1,141 @@
+{
+  "project_id": "ferrous-iridium-286000",
+  "total_count": 27,
+  "active_services": [
+    {
+      "service_name": "Agent Platform API",
+      "api_name": "aiplatform.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Artifact Registry API",
+      "api_name": "artifactregistry.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "BigQuery API",
+      "api_name": "bigquery.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "BigQuery Storage API",
+      "api_name": "bigquerystorage.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Gemini for Google Cloud API",
+      "api_name": "cloudaicompanion.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Google Cloud APIs",
+      "api_name": "cloudapis.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Cloud Asset API",
+      "api_name": "cloudasset.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Cloud Billing API",
+      "api_name": "cloudbilling.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Cloud Build API",
+      "api_name": "cloudbuild.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Cloud Resource Manager API",
+      "api_name": "cloudresourcemanager.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Cloud Trace API",
+      "api_name": "cloudtrace.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Container Registry API",
+      "api_name": "containerregistry.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Cloud Datastore API",
+      "api_name": "datastore.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Identity and Access Management (IAM) API",
+      "api_name": "iam.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "IAM Service Account Credentials API",
+      "api_name": "iamcredentials.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Cloud Identity-Aware Proxy API",
+      "api_name": "iap.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Cloud Logging API",
+      "api_name": "logging.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Cloud Monitoring API",
+      "api_name": "monitoring.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Cloud Pub/Sub API",
+      "api_name": "pubsub.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Cloud Run Admin API",
+      "api_name": "run.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Service Management API",
+      "api_name": "servicemanagement.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Service Usage API",
+      "api_name": "serviceusage.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Cloud SQL",
+      "api_name": "sql-component.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Google Cloud Storage JSON API",
+      "api_name": "storage-api.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Cloud Storage",
+      "api_name": "storage-component.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Cloud Storage API",
+      "api_name": "storage.googleapis.com",
+      "status": "enabled"
+    },
+    {
+      "service_name": "Telemetry API",
+      "api_name": "telemetry.googleapis.com",
+      "status": "enabled"
+    }
+  ]
+}

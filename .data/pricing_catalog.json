@@ -1,0 +1,441 @@
+{
+  "currency": "JPY",
+  "usd_jpy_rate": 155.0,
+  "services": {
+    "OpenLogic CentOS 7.8 (v20200922) - Security Hardened": {
+      "service_id": "0017-8C5E-5B91",
+      "status": "available"
+    },
+    "Single node file server": {
+      "service_id": "002A-FAF7-9793",
+      "status": "available"
+    },
+    "Adverity": {
+      "service_id": "0042-8437-FF55",
+      "status": "available"
+    },
+    "Metabase Data Visualization & BI Platform": {
+      "service_id": "005A-0B51-C56E",
+      "status": "available"
+    },
+    "Qubole Open Data Lake Platform": {
+      "service_id": "0069-3716-5463",
+      "status": "available"
+    },
+    "Nventify Imagizer": {
+      "service_id": "008F-652C-F842",
+      "status": "available"
+    },
+    "Live Stream API": {
+      "service_id": "0094-29B1-96E7",
+      "status": "available"
+    },
+    "CIS (Center for Internet Security) CIS Microsoft Windows Server 2008 R2 Benchmark v3.0.1 Level 1": {
+      "service_id": "0095-7665-C074",
+      "status": "available"
+    },
+    "TigerGraph Inc. TigerGraph Developer Edition 2-6-3": {
+      "service_id": "00C7-CE6D-B98F",
+      "status": "available"
+    },
+    "Commvault Backup & Recovery  BYOL": {
+      "service_id": "00E4-BD19-6904",
+      "status": "available"
+    },
+    "Load Balancer using NGINX (HTTP, Application, TCP)": {
+      "service_id": "0105-B240-3655",
+      "status": "available"
+    },
+    "Google Maps Platform - Routes": {
+      "service_id": "0161-1616-FF1D",
+      "status": "available"
+    },
+    "Vector Search": {
+      "service_id": "0181-3AAD-0CB9",
+      "status": "available"
+    },
+    "Web Risk": {
+      "service_id": "01BA-36F6-AA33",
+      "status": "available"
+    },
+    "Tempered Networks Tempered Airwall Appliance v2.2.8": {
+      "service_id": "01C8-1FC5-46AB",
+      "status": "available"
+    },
+    "CIS PostgreSQL 11 on CentOS Linux 7 Benchmark - Level 1": {
+      "service_id": "01D9-9574-AF68",
+      "status": "available"
+    },
+    "Word Dictionary API": {
+      "service_id": "01F9-FAF7-CFA5",
+      "status": "available"
+    },
+    "osTicket Server Helpdesk Solution on Ubuntu Server 20.04": {
+      "service_id": "0226-575D-63AA",
+      "status": "available"
+    },
+    "NVIDIA Gaming PC - Windows Server 2019": {
+      "service_id": "0231-1FBA-4417",
+      "status": "available"
+    },
+    "Geolocation API": {
+      "service_id": "0245-C3C9-3864",
+      "status": "available"
+    },
+    "MayaData Cloud File Gateway": {
+      "service_id": "0296-B408-6B99",
+      "status": "available"
+    },
+    "Apache Web Server + MySQL + phpMyadmin on Ubuntu Server 20.04": {
+      "service_id": "029B-38E4-68C9",
+      "status": "available"
+    },
+    "Cloud Text-to-Speech API": {
+      "service_id": "02DA-B362-D983",
+      "status": "available"
+    },
+    "F5 Networks F5 Per-App VE  Advanced WAF  (PAYG, 200Mbps)": {
+      "service_id": "02E3-5518-2F6D",
+      "status": "available"
+    },
+    "SellOdoo": {
+      "service_id": "0314-C555-3A8D",
+      "status": "available"
+    },
+    "OneLedger Mainnet Full Node": {
+      "service_id": "032C-45D7-ADF2",
+      "status": "available"
+    },
+    "ELK powered by MIRI": {
+      "service_id": "032C-E934-A7D6",
+      "status": "available"
+    },
+    "Aiven for Redis": {
+      "service_id": "0393-AA9E-2E8F",
+      "status": "available"
+    },
+    "AERIS Aeris Integration Service": {
+      "service_id": "039C-114D-082B",
+      "status": "available"
+    },
+    "Moodle: The Ultimate Learning Management System": {
+      "service_id": "03C0-8240-4A98",
+      "status": "available"
+    },
+    "Cognosys Inc. nopCommerce on Windows 2012 R2": {
+      "service_id": "03ED-D15C-9804",
+      "status": "available"
+    },
+    "Intento Enterprise MT Hub": {
+      "service_id": "0466-AA71-38DA",
+      "status": "available"
+    },
+    "Infoworks DataFoundry": {
+      "service_id": "0483-6CB2-9ABB",
+      "status": "available"
+    },
+    "VMware Tanzu Greenplum BYOL": {
+      "service_id": "04BF-4769-E87A",
+      "status": "available"
+    },
+    "Cloud Natural Language": {
+      "service_id": "04C4-B046-D8B2",
+      "status": "available"
+    },
+    "LNMP Stack With Webmin": {
+      "service_id": "04F6-A7A8-EDF4",
+      "status": "available"
+    },
+    "Webmin GUI Admin Control Panel for CentOS Stream 9": {
+      "service_id": "0530-033B-C90A",
+      "status": "available"
+    },
+    "flarum-08-09-2021": {
+      "service_id": "0544-F909-5498",
+      "status": "available"
+    },
+    "OpenCart": {
+      "service_id": "0579-62CF-63C1",
+      "status": "available"
+    },
+    "DataStax API (Dev)": {
+      "service_id": "0585-9FB4-1E3D",
+      "status": "available"
+    },
+    "Citrix SD-WAN Standard Edition": {
+      "service_id": "05C5-45BF-8282",
+      "status": "available"
+    },
+    "Calculated Systems Certified Nifi": {
+      "service_id": "05C5-F1A3-3EBA",
+      "status": "available"
+    },
+    "Proxy Server - Squid Proxy Cache on Windows 2016": {
+      "service_id": "05CF-B4FB-4E73",
+      "status": "available"
+    },
+    "Ceph Cluster": {
+      "service_id": "060F-09D1-76BF",
+      "status": "available"
+    },
+    "Grafana Cloud": {
+      "service_id": "0648-8D63-9113",
+      "status": "available"
+    },
+    "PostgreSQL 9.6": {
+      "service_id": "0665-C160-E827",
+      "status": "available"
+    },
+    "Zabbix Proxy 5.0 - Appliance with SQLite3": {
+      "service_id": "06DB-6849-B547",
+      "status": "available"
+    },
+    "TYPO3 packaged by Bitnami": {
+      "service_id": "06EF-B241-C096",
+      "status": "available"
+    },
+    "Prediction": {
+      "service_id": "06F5-38F6-036A",
+      "status": "available"
+    },
+    "NVIDIA GPU-Optimized VMI": {
+      "service_id": "0773-E9BA-959C",
+      "status": "available"
+    },
+    "Places API (New)": {
+      "service_id": "0776-5E2E-55E3",
+      "status": "available"
+    },
+    "Cassandra": {
+      "service_id": "0793-445D-C877",
+      "status": "available"
+    },
+    "PixStor Cloud - Balanced Tier": {
+      "service_id": "07AF-A280-7D4E",
+      "status": "available"
+    },
+    "Kong Konnect Enterprise 2.5 (BYOL)": {
+      "service_id": "0889-4E59-60BB",
+      "status": "available"
+    },
+    "Partner Demo Test WordPress": {
+      "service_id": "0DC6-1D65-6DAA",
+      "status": "available"
+    },
+    "Bitnami Trac Certified by Bitnami": {
+      "service_id": "08B3-A6E6-BC4C",
+      "status": "available"
+    },
+    "Moodle on CentOS 7": {
+      "service_id": "08CB-3A3E-55D0",
+      "status": "available"
+    },
+    "Cudinator": {
+      "service_id": "08CF-542F-79CD",
+      "status": "available"
+    },
+    "End-to-end Testing Cloud Marketplace Test VM Solution": {
+      "service_id": "08E2-8B5A-67A5",
+      "status": "available"
+    },
+    "Orangehrm": {
+      "service_id": "08F1-4F44-8F77",
+      "status": "available"
+    },
+    "Cognosys Inc. Wireshark on Windows 2012 R2": {
+      "service_id": "0907-76FC-2D82",
+      "status": "available"
+    },
+    "Visual Studio 2017 Enterprise on Hardened Windows Server 2016": {
+      "service_id": "096B-2777-7034",
+      "status": "available"
+    },
+    "Jenkins Server on Ubuntu Server 20.04": {
+      "service_id": "098B-FCB7-EA00",
+      "status": "available"
+    },
+    "Bitnami eXo Platform Certified by Bitnami": {
+      "service_id": "09B4-5C41-3168",
+      "status": "available"
+    },
+    "PrestaShop on Windows 2012 R2": {
+      "service_id": "09EA-6B4A-550E",
+      "status": "available"
+    },
+    "OpenVPN Access Server": {
+      "service_id": "0A07-96A6-8158",
+      "status": "available"
+    },
+    "dbX": {
+      "service_id": "0A1B-8300-DD2F",
+      "status": "available"
+    },
+    "Traffic Manager Standard Edition & WAF - 200 Mbps": {
+      "service_id": "0A7C-45F4-3FA2",
+      "status": "available"
+    },
+    "Test Marketplace Procurable OP Full Solution": {
+      "service_id": "0A84-D90D-8FF5",
+      "status": "available"
+    },
+    "SAP HANA, express edition": {
+      "service_id": "0AA9-12E2-E3B3",
+      "status": "available"
+    },
+    "Geocoding API": {
+      "service_id": "0AC2-4B25-C429",
+      "status": "available"
+    },
+    "BigtreeCMS": {
+      "service_id": "0AD3-8373-BA0C",
+      "status": "available"
+    },
+    "Apache Web Server with CentOS 8 Stream": {
+      "service_id": "0AE8-6817-BF80",
+      "status": "available"
+    },
+    "wiki": {
+      "service_id": "0B17-CB77-0CFB",
+      "status": "available"
+    },
+    "WooCommerce": {
+      "service_id": "0B33-32A6-0195",
+      "status": "available"
+    },
+    "Magento on Ubuntu 16.04 LTS": {
+      "service_id": "0B3D-3970-6824",
+      "status": "available"
+    },
+    "Dolibarr: Streamline Your Business on Ubuntu 16.04 lts and GCP": {
+      "service_id": "0B66-A72A-124C",
+      "status": "available"
+    },
+    "JENKINS": {
+      "service_id": "0B9E-6C8C-DD9D",
+      "status": "available"
+    },
+    "PREDICTIVE ANALYTICS FRAMEWORK R HADOOP": {
+      "service_id": "0BB0-D027-38CF",
+      "status": "available"
+    },
+    "FortiGate Next-Generation Firewall (PAYG)": {
+      "service_id": "0BCC-06B3-2936",
+      "status": "available"
+    },
+    "Nodejs": {
+      "service_id": "0C02-7C8D-EF19",
+      "status": "available"
+    },
+    "Active Directory Certificate Services PKI on Windows Server 2019": {
+      "service_id": "0C29-4558-56A5",
+      "status": "available"
+    },
+    "Twinword Text Analysis API Bundle": {
+      "service_id": "0C76-2443-BB08",
+      "status": "available"
+    },
+    "Ghost packaged by Bitnami": {
+      "service_id": "0CDB-535D-F102",
+      "status": "available"
+    },
+    "Money Saver VM": {
+      "service_id": "0CE3-7ECE-F8E8",
+      "status": "available"
+    },
+    "Panzura Inc. Panzura Freedom Filer": {
+      "service_id": "0CE5-D17E-5150",
+      "status": "available"
+    },
+    "Route Optimization API": {
+      "service_id": "0D08-5400-B9BF",
+      "status": "available"
+    },
+    "Cloud Data Fusion": {
+      "service_id": "0D19-EC86-35B0",
+      "status": "available"
+    },
+    "RCC-WRF": {
+      "service_id": "0D8A-2359-6554",
+      "status": "available"
+    },
+    "MODX packaged by Bitnami": {
+      "service_id": "0D8E-1AE9-3C0D",
+      "status": "available"
+    },
+    "Hammerspace Explorer": {
+      "service_id": "0DB2-DA22-4680",
+      "status": "available"
+    },
+    "Sql Server 2016 Web on Windows Server 2016 ": {
+      "service_id": "0DB7-4F53-9E69",
+      "status": "available"
+    },
+    "Windows Server 2016 Core Minimal OS": {
+      "service_id": "0DCF-AFEF-00F3",
+      "status": "available"
+    },
+    "Cavirin Systems Cavirin CyberPosture": {
+      "service_id": "0DD1-1C43-950F",
+      "status": "available"
+    },
+    "TigerGraph Inc. TigerGraph Developer Edition 2.5.0": {
+      "service_id": "0DD7-0FEC-3F5B",
+      "status": "available"
+    },
+    "OrangeHRM-The Ultimate HR Management Solution": {
+      "service_id": "0E0F-DA3F-B05F",
+      "status": "available"
+    },
+    "OrangeHRM on Windows 2012 R2": {
+      "service_id": "0E58-DAEF-CFCC",
+      "status": "available"
+    },
+    "orbs-gamma-devkit": {
+      "service_id": "0E68-026D-C6B6",
+      "status": "available"
+    },
+    "AI/ML development, training & inference using Python & Jupyter": {
+      "service_id": "0E69-0162-6B36",
+      "status": "available"
+    }
+  },
+  "master_prices": {
+    "cloud_run": {
+      "cpu_per_vcpu_sec_jpy": 0.00372,
+      "memory_per_gb_sec_jpy": 0.00038750000000000004,
+      "request_per_count_jpy": 6.2e-05
+    },
+    "cloud_storage": {
+      "class_a_write_per_op_jpy": 0.0007750000000000001,
+      "class_b_read_per_op_jpy": 6.2e-05,
+      "storage_per_gb_month_jpy": 3.1
+    },
+    "gemini_api": {
+      "image_generation_per_image_jpy": 6.0,
+      "input_text_per_1k_tokens_jpy": 0.023249999999999996,
+      "output_text_per_1k_tokens_jpy": 0.09299999999999999
+    },
+    "bigquery": {
+      "query_per_tb_scanned_jpy": 968.75,
+      "storage_per_gb_month_jpy": 3.1
+    },
+    "cloud_functions": {
+      "invocations_per_million_jpy": 62.0,
+      "compute_time_per_gb_sec_jpy": 0.00038750000000000004
+    },
+    "pubsub": {
+      "message_ingestion_per_gb_jpy": 6.2
+    },
+    "compute_engine": {
+      "e2_micro_hour_jpy": 1.3019999999999998,
+      "standard_disk_gb_month_jpy": 6.2
+    },
+    "secret_manager": {
+      "secret_version_month_jpy": 9.299999999999999,
+      "access_per_10k_ops_jpy": 4.6499999999999995
+    },
+    "artifact_registry": {
+      "storage_per_gb_month_jpy": 15.5
+    }
+  }
+}
