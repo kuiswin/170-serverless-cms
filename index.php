@@ -50,14 +50,18 @@ function get_gcs_url($bucket_name, $filename) {
 }
 
 // Load post metadata list from GCS (posts.json) with auto-seeding for empty/new environments
-function load_posts_metadata($bucket) {
+function load_posts_metadata($bucket, &$generation = null) {
     $object = $bucket->object('posts.json');
     if ($object->exists()) {
+        $info = $object->info();
+        $generation = $info['generation'] ?? null;
         $content = $object->downloadAsString();
         $data = json_decode($content, true);
         if (!empty($data)) {
             return $data;
         }
+    } else {
+        $generation = 0; // 初回非存在時の作成条件 (ifGenerationMatch => 0)
     }
 
     // Default poem data to seed
@@ -520,15 +524,16 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST' && $is_logged_
             // Try to generate AI featured image (using title + markdown content)
             $image_path = generate_featured_image($title, $markdown, $post_id, $media_bucket_name, $storage);
             
-            // Update posts.json metadata list
-            $posts = load_posts_metadata($bucket);
+            // Update posts.json metadata list with initial generation check
+            $initial_gen = null;
+            $posts = load_posts_metadata($bucket, $initial_gen);
             array_unshift($posts, [
                 'id' => $post_id,
                 'title' => $title,
                 'date' => date('Y-m-d H:i:s'),
                 'image_path' => $image_path
             ]);
-            if (!save_posts_metadata($bucket, $posts)) {
+            if (!save_posts_metadata($bucket, $posts, $initial_gen)) {
                 http_response_code(409);
                 $error = 'エラー: 同時更新による競合が発生しました。時間を置いて再度お試しください。';
             } else {
