@@ -287,11 +287,9 @@ function generate_featured_image($title, $content, $post_id, $media_bucket_name,
     $summary = mb_substr(strip_tags($content), 0, 300);
     $prompt = "A professional, high-end 16:9 featured header image illustration for a blog post titled '{$title}'. Story context: '{$summary}'. Aesthetic digital art, rich colors, cinematic lighting, 4k resolution, no text overlay.";
 
-    // Vertex AI Models to try (Primary: Imagen 3 / Imagen 4)
+    // Vertex AI Primary Model (Imagen 3)
     $models = [
-        'imagen-3.0-generate-002',
-        'imagen-3.0-fast-generate-001',
-        'gemini-3.1-flash-lite-image'
+        'imagen-3.0-generate-002'
     ];
 
     foreach ($models as $model_id) {
