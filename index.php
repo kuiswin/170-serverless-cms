@@ -364,8 +364,6 @@ function generate_featured_image($title, $content, $post_id, $media_bucket_name,
     error_log('Vertex AI Image Gen: All model attempts failed.');
     return null;
 }
-    return null;
-}
 
 // Helper functions for stateless auth cookies (used in production for zero-scale persistence)
 function generate_auth_token($email, $secret_hash) {
