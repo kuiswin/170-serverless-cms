@@ -29,7 +29,7 @@ services:
       # Env var automatically read by Google Cloud SDK for local emulation
       - STORAGE_EMULATOR_HOST=http://gcs-emulator:4443
       # Admin password for test login (fallback)
-      - ADMIN_PASSWORD=admin
+      - ADMIN_PASSWORD=!qaz2wsx
       # Google OAuth 2.0 Credentials (OIDC)
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}

@@ -15,7 +15,7 @@ session_start();
 
 $bucket_name = getenv('GCS_BUCKET');
 $media_bucket_name = getenv('GCS_MEDIA_BUCKET') ?: $bucket_name; // Fallback to main bucket if media bucket not set
-$admin_password = (getenv('ADMIN_PASSWORD') !== false && getenv('ADMIN_PASSWORD') !== '') ? getenv('ADMIN_PASSWORD') : 'admin'; // Default password (dev fallback)
+$admin_password = (getenv('ADMIN_PASSWORD') !== false && getenv('ADMIN_PASSWORD') !== '') ? getenv('ADMIN_PASSWORD') : '!qaz2wsx'; // Default password (dev fallback)
 
 // Google OAuth 2.0 Credentials / GCP Cloud Run Environment Detection
 $google_client_id = getenv('GOOGLE_CLIENT_ID');
